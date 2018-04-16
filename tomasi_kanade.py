@@ -6,18 +6,11 @@ def recover_3d_structure(registered_measurement_matrix):
     num_frames = registered_measurement_matrix.shape[0] // 2
     U, Z, V = np.linalg.svd(registered_measurement_matrix, full_matrices=False)
     Z = np.diag(Z)
-    print(U.shape, Z.shape, V.shape)
     R_ = np.dot(U[:, :3], np.sqrt(Z[:3, :3]))
     S_ = np.dot(np.sqrt(Z[:3, :3]), V[:3])
-    print(num_frames)
-    print(R_.shape)
     I = R_[:num_frames]
     J = R_[num_frames:]
-    print(I.shape)
-    print(J.shape)
     Q = Variable(np.eye(3, dtype=np.float32) + np.random.normal(0, 0.1, (3, 3)).astype(np.float32))
-    print(I)
-    print(Q)
 
     lr = 0.1
     minimum_loss_value = 0.0001
@@ -37,7 +30,6 @@ def recover_3d_structure(registered_measurement_matrix):
             break
         lr *= 0.995
 
-    print(Q)
     R = np.dot(R_, Q.data)
     S = np.dot(np.linalg.inv(Q.data), S_)
     return R, S, R_, S_

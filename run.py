@@ -6,6 +6,7 @@ import plotly.plotly as py
 import plotly.graph_objs as graph
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 import tomasi_kanade
 
@@ -49,7 +50,6 @@ def main():
         ],
         dtype=np.float32)
 
-    print(object_points)
     measurement_matrix_list_x = [[] for i in range(9)]
     measurement_matrix_list_y = [[] for i in range(9)]
 
@@ -88,18 +88,40 @@ def main():
     registered_measurement_matrix = measurement_matrix - np.mean(
         measurement_matrix, axis=0)[None, :]
 
-    print(registered_measurement_matrix, registered_measurement_matrix.shape)
+    R, S, R_, S_ = tomasi_kanade.recover_3d_structure(
+        registered_measurement_matrix)
 
-    R, S, R_, S_ = tomasi_kanade.recover_3d_structure(registered_measurement_matrix)
-    print(R.shape)
-    print(S.shape)
+    print(object_points.shape)
 
     fig = plt.figure()
+    fig.canvas.set_window_title("True shape")
     ax = fig.gca(projection="3d")
-    ax.plot_trisurf(S[0], S[1], S[2], linewidth=0.2, antialiased=True)
+    ax.scatter(
+        object_points[0],
+        object_points[1],
+        object_points[2],
+        linewidth=0.2,
+        antialiased=True)
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_zlim(-1, 1)
+
     fig = plt.figure()
+    fig.canvas.set_window_title("Estimated structure (transformed)")
     ax = fig.gca(projection="3d")
-    ax.plot_trisurf(S_[0], S_[1], S_[2], linewidth=0.2, antialiased=True)
+    ax.scatter(S_[0], S_[1], S_[2], linewidth=0.2, antialiased=True)
+    ax.set_xlim(-2, 2)
+    ax.set_ylim(-2, 2)
+    ax.set_zlim(-2, 2)
+
+    fig = plt.figure()
+    fig.canvas.set_window_title("Estimated structure")
+    ax = fig.gca(projection="3d")
+    ax.scatter(S[0], S[1], S[2], linewidth=0.2, antialiased=True)
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_zlim(-1, 1)
+
     plt.show()
 
 
