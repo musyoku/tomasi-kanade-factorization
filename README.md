@@ -1,6 +1,6 @@
 ## Tomasi-Kanade Factorization
 
-Tomasi-Kanadeの因子分解法のPython実装例です。
+**Tomasi-Kanadeの因子分解法**の特異値分解による計算手法のPython実装例です。
 
 Chainerの自動微分を利用しています。
 
