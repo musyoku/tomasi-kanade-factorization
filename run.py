@@ -50,8 +50,9 @@ def main():
         ],
         dtype=np.float32)
 
-    measurement_matrix_list_x = [[] for i in range(9)]
-    measurement_matrix_list_y = [[] for i in range(9)]
+    total_vertices = object_points.shape[1]
+    measurement_matrix_list_x = [[] for i in range(total_vertices)]
+    measurement_matrix_list_y = [[] for i in range(total_vertices)]
 
     # ランダムな角度で正射影する
     for frame in range(100):
@@ -71,12 +72,21 @@ def main():
             dtype=np.float32)
         rotation_matrix = np.dot(rotation_matrix_axis_x,
                                  rotation_matrix_axis_y)
-        rotated_cube = np.dot(rotation_matrix, object_points)
+        rotated_object = np.dot(rotation_matrix, object_points)
 
         # 正射影
-        for i in range(9):
-            measurement_matrix_list_x[i].append(rotated_cube[0, i])
-            measurement_matrix_list_y[i].append(rotated_cube[1, i])
+        for i in range(total_vertices):
+            measurement_matrix_list_x[i].append(rotated_object[0, i])
+            measurement_matrix_list_y[i].append(rotated_object[1, i])
+
+        # fig = plt.figure()
+        # fig.canvas.set_window_title("Projection")
+        # ax = fig.gca()
+        # ax.scatter(rotated_object[0], rotated_object[1])
+        # ax.set_xlim(-1, 1)
+        # ax.set_ylim(-1, 1)
+        # plt.show()
+        # return
 
     measurement_matrix_x = np.asarray(
         measurement_matrix_list_x, dtype=np.float32)
@@ -94,12 +104,7 @@ def main():
     fig = plt.figure()
     fig.canvas.set_window_title("True shape")
     ax = fig.gca(projection="3d")
-    ax.scatter(
-        object_points[0],
-        object_points[1],
-        object_points[2],
-        linewidth=0.2,
-        antialiased=True)
+    ax.scatter(object_points[0], object_points[1], object_points[2])
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(-1, 1)
@@ -107,7 +112,7 @@ def main():
     fig = plt.figure()
     fig.canvas.set_window_title("Estimated structure (transformed)")
     ax = fig.gca(projection="3d")
-    ax.scatter(S_[0], S_[1], S_[2], linewidth=0.2, antialiased=True)
+    ax.scatter(S_[0], S_[1], S_[2])
     ax.set_xlim(-2, 2)
     ax.set_ylim(-2, 2)
     ax.set_zlim(-2, 2)
@@ -115,7 +120,7 @@ def main():
     fig = plt.figure()
     fig.canvas.set_window_title("Estimated structure")
     ax = fig.gca(projection="3d")
-    ax.scatter(S[0], S[1], S[2], linewidth=0.2, antialiased=True)
+    ax.scatter(S[0], S[1], S[2])
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(-1, 1)
