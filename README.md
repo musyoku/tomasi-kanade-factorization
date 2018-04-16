@@ -1,0 +1,2 @@
+Tomasi-Kanadeの因子分解法のPython実装例です。
+Chainerの自動微分を利用しています。
