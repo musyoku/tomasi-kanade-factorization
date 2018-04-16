@@ -10,7 +10,9 @@ def recover_3d_structure(registered_measurement_matrix):
     S_ = np.dot(np.sqrt(Z[:3, :3]), V[:3])
     I = R_[:num_frames]
     J = R_[num_frames:]
-    Q = Variable(np.eye(3, dtype=np.float32) + np.random.normal(0, 0.1, (3, 3)).astype(np.float32))
+    Q = Variable(
+        np.eye(3, dtype=np.float32) + np.random.normal(0, 0.1, (
+            3, 3)).astype(np.float32))
 
     lr = 0.1
     minimum_loss_value = 0.0001
@@ -21,8 +23,10 @@ def recover_3d_structure(registered_measurement_matrix):
         loss_ii = fn.sum(fn.matmul(fn.matmul(I, Q), Q.T) * I, axis=1)
         loss_jj = fn.sum(fn.matmul(fn.matmul(J, Q), Q.T) * J, axis=1)
         loss_ij = fn.sum(fn.matmul(fn.matmul(I, Q), Q.T) * J, axis=1)
-        loss = fn.mean_squared_error(loss_ii, target_ii) + fn.mean_squared_error(
-            loss_jj, target_jj) + fn.mean_squared_error(loss_ij, target_ij)
+        loss = fn.mean_squared_error(
+            loss_ii, target_ii) + fn.mean_squared_error(
+                loss_jj, target_jj) + fn.mean_squared_error(
+                    loss_ij, target_ij)
         Q.cleargrad()
         loss.backward()
         Q.data -= lr * Q.grad

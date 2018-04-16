@@ -91,8 +91,6 @@ def main():
     R, S, R_, S_ = tomasi_kanade.recover_3d_structure(
         registered_measurement_matrix)
 
-    print(object_points.shape)
-
     fig = plt.figure()
     fig.canvas.set_window_title("True shape")
     ax = fig.gca(projection="3d")
