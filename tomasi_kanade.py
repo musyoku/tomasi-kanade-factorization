@@ -2,9 +2,9 @@ import numpy as np
 from chainer import functions as fn, Variable
 
 
-def recover_3d_structure(registered_measurement_matrix):
-    num_frames = registered_measurement_matrix.shape[0] // 2
-    U, Z, V = np.linalg.svd(registered_measurement_matrix, full_matrices=False)
+def recover_3d_structure(measurement_matrix):
+    num_frames = measurement_matrix.shape[0] // 2
+    U, Z, V = np.linalg.svd(measurement_matrix, full_matrices=False)
     Z = np.diag(Z)
     R_ = np.dot(U[:, :3], np.sqrt(Z[:3, :3]))
     S_ = np.dot(np.sqrt(Z[:3, :3]), V[:3])
