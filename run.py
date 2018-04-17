@@ -52,33 +52,29 @@ def main():
 
     total_vertices = object_points.shape[1]
 
-    measurement_matrix_list_x = [[] for i in range(total_vertices)]
-    measurement_matrix_list_y = [[] for i in range(total_vertices)]
+    measurement_matrix_list_x = []
+    measurement_matrix_list_y = []
 
     # ランダムな角度で正射影する
     for frame in range(100):
         random_rad_x = math.pi * random.uniform(-2.0, 2.0)
         random_rad_y = math.pi * random.uniform(-2.0, 2.0)
         rotation_matrix_axis_x = np.array(
-            [[1.0, 0.0, 0.0], [
-                0.0, math.cos(random_rad_x), -math.sin(random_rad_x)
-            ], [0.0, math.sin(random_rad_x),
-                math.cos(random_rad_x)]],
+            [[1.0, 0.0, 0.0],
+             [0.0, math.cos(random_rad_x), -math.sin(random_rad_x)],
+             [0.0, math.sin(random_rad_x), math.cos(random_rad_x)]],
             dtype=np.float32)
         rotation_matrix_axis_y = np.array(
-            [[math.cos(random_rad_y), 0.0, -math.sin(random_rad_y)], [
-                0.0, 1.0, 0.0
-            ], [math.sin(random_rad_y), 0.0,
-                math.cos(random_rad_y)]],
+            [[math.cos(random_rad_y), 0.0, -math.sin(random_rad_y)],
+             [0.0, 1.0, 0.0],
+             [math.sin(random_rad_y), 0.0, math.cos(random_rad_y)]],
             dtype=np.float32)
-        rotation_matrix = np.dot(rotation_matrix_axis_x,
-                                 rotation_matrix_axis_y)
+        rotation_matrix = np.dot(rotation_matrix_axis_x, rotation_matrix_axis_y)
         rotated_object = np.dot(rotation_matrix, object_points)
 
         # 正射影
-        for i in range(total_vertices):
-            measurement_matrix_list_x[i].append(rotated_object[0, i])
-            measurement_matrix_list_y[i].append(rotated_object[1, i])
+        measurement_matrix_list_x.append(rotated_object[0])
+        measurement_matrix_list_y.append(rotated_object[1])
 
         # fig = plt.figure()
         # fig.canvas.set_window_title("Projection")
@@ -89,20 +85,15 @@ def main():
         # plt.show()
         # return
 
-    measurement_matrix_x = np.asarray(
-        measurement_matrix_list_x, dtype=np.float32)
-    measurement_matrix_x = measurement_matrix_x - np.mean(
-        measurement_matrix_x, axis=0)[None, :]
+    measurement_matrix_x = np.asanyarray(measurement_matrix_list_x, dtype=np.float32)
+    measurement_matrix_y = np.asanyarray(measurement_matrix_list_y, dtype=np.float32)
+    measurement_matrix = np.concatenate((measurement_matrix_x, measurement_matrix_y), axis=0)
 
-    measurement_matrix_y = np.asarray(
-        measurement_matrix_list_y, dtype=np.float32)
-    measurement_matrix_y = measurement_matrix_y - np.mean(
-        measurement_matrix_y, axis=0)[None, :]
+    registered_measurement_matrix = measurement_matrix - np.mean(
+        measurement_matrix, axis=1)[:, None]
 
-    measurement_matrix = np.concatenate(
-        (measurement_matrix_x.T, measurement_matrix_y.T), axis=0)
-
-    R, S, R_, S_ = tomasi_kanade.recover_3d_structure(measurement_matrix)
+    R, S, R_, S_ = tomasi_kanade.recover_3d_structure(
+        registered_measurement_matrix)
 
     fig = plt.figure()
     fig.canvas.set_window_title("True shape")
